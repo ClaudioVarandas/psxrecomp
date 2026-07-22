@@ -523,6 +523,13 @@ struct GameConfig {
     // auto-detector cannot qualify (e.g. an X-only test with no height compare
     // in the same function — Ape Escape 0x8004AB64). Empty by default; regen.
     std::vector<uint32_t> ws_cull_slti_sites;
+    // [widescreen.cull] bltz_sites — explicit signed LEFT-edge widen sites
+    // (`bltz rs, reject` -> psx_ws_cull_bltz), the counterpart to slti_sites.
+    // The auto-detector's left-edge bltz classification (detect_cull_bltz_sites)
+    // only runs for functions it qualified via auto_screen_x; an X-only funnel
+    // wired through explicit slti_sites therefore has NO left-edge widen without
+    // this. Empty by default; identity at 4:3; regen required.
+    std::vector<uint32_t> ws_cull_bltz_sites;
     // Horizontal low-edge form `subu rd,zero,rs` -> `-rs-x_margin`.
     // Empty by default; configured sites require regenerated native code.
     std::vector<uint32_t> ws_cull_negsub_sites;
@@ -613,6 +620,15 @@ struct GameConfig {
     // Defaults on for compatibility. Titles can keep the original GTE-squash
     // + stretched-present path when native-wide is not regression-free.
     bool ws_native_wide = true;
+
+    // [widescreen] stretch_2d / stretch_fmv — "fill the whole widescreen"
+    // player-preference overrides for the 4:3 pins in
+    // gpu_ws_present_native_43(). stretch_2d: menus/title/loading & 2D-only
+    // scenes present stretched to the wide aspect (2D UI warps). stretch_fmv:
+    // FMV video presents stretched (4:3 video distorts). Runtime-only; off by
+    // default so the faithful 4:3 pillarbox stays the default.
+    bool ws_stretch_2d  = false;
+    bool ws_stretch_fmv = false;
 
     // [widescreen] nw_hud_corners — in native-wide, push outer-third screen-
     // space HUD sprites out to the true wide-frame corners (they otherwise sit
